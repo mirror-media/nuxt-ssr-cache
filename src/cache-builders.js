@@ -29,11 +29,34 @@ function redisCache(config) {
             .then(() => client.quit());
     }
 
-    return cacheManager.caching({
+    let cacheConfig = Object.assign({}, config)
+    if (config.readHost && config.writeHost && config.readHost !== config.writeHost) {
+      const writeCache = cacheManager.caching({
         store: require('cache-manager-redis'),
         retry_strategy() {},
-        ...config,
+        ...cacheConfig,
+        host: config.writeHost
+      });
+      const readCache = cacheManager.caching({
+        store: require('cache-manager-redis'),
+        retry_strategy() {},
+        ...cacheConfig,
+        host: config.readHost
+      });
+      return {
+        writeCache,
+        readCache
+      }
+    } else if (config.readHost === config.writeHost) {
+      cacheConfig.host = config.readHost
+    }
+
+    const defaultCache = cacheManager.caching({
+      store: require('cache-manager-redis'),
+      retry_strategy() {},
+      ...cacheConfig,
     });
+    return defaultCache
 }
 
 function memcachedCache(config) {
@@ -59,6 +82,13 @@ function makeCache(config = { type: 'memory' }) {
     const builder = cacheBuilders[config.type];
     if (!builder) {
         throw new Error('Unknown store type: ' + config.type)
+    }
+
+    if (config.type === 'redis' && config.readHost && config.writeHost && config.readHost !== config.writeHost) {
+      return {
+        readCache: Promise.promisifyAll(builder(config).readCache),
+        writeCache: Promise.promisifyAll(builder(config).writeCache)
+      }
     }
 
     return Promise.promisifyAll(builder(config));

@@ -60,13 +60,13 @@ module.exports = function cacheRenderer(nuxt, config) {
 
     const currentVersion = config.version || config.cache.version;
     const cache = makeCache(config.cache.store);
-    cleanIfNewVersion(cache, currentVersion);
+    cleanIfNewVersion(cache.writeCache || cache, currentVersion);
 
     const renderer = nuxt.renderer;
     const renderRoute = renderer.renderRoute.bind(renderer);
     renderer.renderRoute = function(route, context) {
         // hopefully cache reset is finished up to this point.
-        tryStoreVersion(cache, currentVersion);
+        tryStoreVersion(cache.writeCache || cache, currentVersion);
 
         const cacheKey = (config.cache.key || defaultCacheKeyBuilder)(route, context);
         if (!cacheKey) return renderRoute(route, context);
@@ -75,13 +75,15 @@ module.exports = function cacheRenderer(nuxt, config) {
             return renderRoute(route, context)
                 .then(function(result) {
                     if (!result.error && !result.redirected) {
-                        cache.setAsync(cacheKey, serialize(result));
+                        const cacheWrite = cache.writeCache || cache
+                        cacheWrite.setAsync(cacheKey, serialize(result));
                     }
                     return result;
                 });
         }
 
-        return cache.getAsync(cacheKey)
+        const cacheRead = cache.readCache || cache
+        return cacheRead.getAsync(cacheKey)
             .then(function (cachedResult) {
                 if (cachedResult) {
                     return deserialize(cachedResult);
