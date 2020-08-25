@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/arash16/nuxt-ssr-cache.git"
+    "url": "git+ssh://git@github.com/mirror-media/nuxt-ssr-cache.git"
   },
   "keywords": [
     "nuxt",
@@ -23,12 +23,12 @@
     "vue",
     "spa"
   ],
-  "author": "Arash Shakery <arash.shakery@gmail.com> (arash16.com)",
+  "author": "kwhsiung <kaiwenhsiung@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/arash16/nuxt-ssr-cache/issues"
+    "url": "https://github.com/mirror-media/nuxt-ssr-cache/issues"
   },
-  "homepage": "https://github.com/arash16/nuxt-ssr-cache#readme",
+  "homepage": "https://github.com/mirror-media/nuxt-ssr-cache#readme",
   "dependencies": {
     "bluebird": "^3.5.5",
     "cache-manager": "^2.9.1",
