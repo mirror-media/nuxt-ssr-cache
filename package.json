@@ -1,7 +1,10 @@
 {
-  "name": "nuxt-ssr-cache",
-  "version": "1.5.2",
+  "name": "@mirror-media/nuxt-ssr-cache",
+  "version": "1.6.0",
   "description": "Cache middleware for nuxt's SSR rendering.",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "lib/middleware.js",
   "scripts": {
     "build": "babel src --out-dir lib",
