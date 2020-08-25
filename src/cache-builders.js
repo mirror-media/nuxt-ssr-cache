@@ -47,7 +47,7 @@ function redisCache(config) {
         writeCache,
         readCache
       }
-    } else if (config.readHost === config.writeHost) {
+    } else if (config.readHost && config.writeHost && (config.readHost === config.writeHost)) {
       cacheConfig.host = config.readHost
     }
 
