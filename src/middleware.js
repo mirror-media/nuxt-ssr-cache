@@ -76,7 +76,10 @@ module.exports = function cacheRenderer(nuxt, config) {
                 .then(function(result) {
                     if (!result.error && !result.redirected) {
                         const cacheWrite = cache.writeCache || cache
-                        cacheWrite.setAsync(cacheKey, serialize(result));
+                        const headers = context.res.getHeaders()
+                        const cacheControl = headers['cache-control'] || headers['Cache-Control'] || 'no-store'
+                        const resultWithCacheControl = Object.assign({}, { cacheControl }, result)
+                        cacheWrite.setAsync(cacheKey, serialize(resultWithCacheControl));
                     }
                     return result;
                 });
@@ -86,7 +89,12 @@ module.exports = function cacheRenderer(nuxt, config) {
         return cacheRead.getAsync(cacheKey)
             .then(function (cachedResult) {
                 if (cachedResult) {
-                    return deserialize(cachedResult);
+                    const result = deserialize(cachedResult)
+                    if (result.hasOwnProperty('cacheControl')) {
+                      const cacheControl = result.cacheControl
+                      context.res.setHeader('Cache-Control', cacheControl)
+                    }
+                    return result;
                 }
 
                 return renderSetCache();
