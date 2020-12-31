@@ -79,7 +79,9 @@ module.exports = function cacheRenderer(nuxt, config) {
                         const headers = context.res.getHeaders()
                         const cacheControl = headers['cache-control'] || headers['Cache-Control'] || 'no-store'
                         const resultWithCacheControl = Object.assign({}, { cacheControl }, result)
-                        cacheWrite.setAsync(cacheKey, serialize(resultWithCacheControl));
+                        if (cacheControl !== 'no-store') {
+                          cacheWrite.setAsync(cacheKey, serialize(resultWithCacheControl));
+                        }
                     }
                     return result;
                 });
